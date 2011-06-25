@@ -1,0 +1,65 @@
+diff -up iputils-s20070202/arping.c.arping_timeout iputils-s20070202/arping.c
+--- iputils-s20070202/arping.c.arping_timeout	2008-02-18 16:51:36.000000000 +0100
++++ iputils-s20070202/arping.c	2008-02-18 16:54:03.000000000 +0100
+@@ -45,7 +45,8 @@ struct in_addr src, dst;
+ char *target;
+ int dad, unsolicited, advert;
+ int quiet;
+-int count=-1;
++int count;
++int forever = 1;
+ int timeout;
+ int unicasting;
+ int s;
+@@ -59,7 +60,7 @@ int broadcast_only;
+ struct sockaddr_ll me[2];
+ struct sockaddr_ll he[2];
+ 
+-struct timeval start, last;
++struct timeval last;
+ 
+ int sent, brd_sent;
+ int received, brd_recv, req_recv;
+@@ -172,13 +173,15 @@ void catcher(void)
+ 
+ 	gettimeofday(&tv, NULL);
+ 
+-	if (start.tv_sec==0)
+-		start = tv;
+-
+-	if (count-- == 0 || (timeout && MS_TDIFF(tv,start) > timeout*1000 + 500))
+-		finish();
++	if (!forever && count == 0) {
++		if (timeout && MS_TDIFF(tv, last) > timeout * 1000 + 500)
++			finish();
++		else if (!timeout)
++			finish();
++	}
+ 
+-	if (last.tv_sec==0 || MS_TDIFF(tv,last) > 500) {
++	if ((count > 0 || forever) && (last.tv_sec == 0 || MS_TDIFF(tv, last) > 500)) {
++		count--;
+ 		send_pack(s, src, dst, &me[0], &he[0]);
+ 		if (count == 0 && unsolicited)
+ 			finish();
+@@ -339,6 +342,10 @@ main(int argc, char **argv)
+ 			break;
+ 		case 'c':
+ 			count = atoi(optarg);
++			if (count > 0)
++				forever = 0;
++			else
++				forever = 1;
+ 			break;
+ 		case 'w':
+ 			timeout = atoi(optarg);
+@@ -544,7 +551,8 @@ main(int argc, char **argv)
+ 		sigaddset(&sset, SIGALRM);
+ 		sigaddset(&sset, SIGINT);
+ 		sigprocmask(SIG_BLOCK, &sset, &osset);
+-		recv_pack(packet, cc, &from[0]);
++		if (recv_pack(packet, cc, from) && count == 0 && !forever)
++			finish();
+ 		sigprocmask(SIG_SETMASK, &osset, NULL);
+ 	}
+ }

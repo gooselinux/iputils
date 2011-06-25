@@ -1,0 +1,12 @@
+diff -up iputils-s20071127/doc/tracepath.sgml.typing_bug iputils-s20071127/doc/tracepath.sgml
+--- iputils-s20071127/doc/tracepath.sgml.typing_bug	2008-08-05 15:29:51.000000000 +0200
++++ iputils-s20071127/doc/tracepath.sgml	2008-08-05 15:30:12.000000000 +0200
+@@ -99,7 +99,7 @@ with TTL of 2 was rejected at the first 
+ </para>
+ 
+ <para>
+-Te last line summarizes information about all the path to the destination,
++The last line summarizes information about all the path to the destination,
+ it shows detected Path MTU, amount of hops to the destination and our
+ guess about amount of hops from the destination to us, which can be
+ different when the path is asymmetric.

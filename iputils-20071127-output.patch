@@ -1,0 +1,34 @@
+diff -up iputils-s20071127/ping_common.c.output iputils-s20071127/ping_common.c
+--- iputils-s20071127/ping_common.c.output	2008-02-26 14:12:02.000000000 +0100
++++ iputils-s20071127/ping_common.c	2008-02-26 14:24:34.000000000 +0100
+@@ -791,8 +791,10 @@ static long llsqrt(long long a)
+  */
+ void finish(void)
+ {
+-	struct timeval tv = cur_time;
++	struct timeval tv;
++	char *comma = "";
+ 
++	gettimeofday(&tv, NULL);
+ 	tvsub(&tv, &start_time);
+ 
+ 	putchar('\n');
+@@ -827,12 +829,15 @@ void finish(void)
+ 		       (long)tmax/1000, (long)tmax%1000,
+ 		       (long)tmdev/1000, (long)tmdev%1000
+ 		       );
++		comma = ", ";
++	}
++	if (pipesize > 1) {
++		printf("%spipe %d", comma, pipesize);
++		comma = ", ";
+ 	}
+-	if (pipesize > 1)
+-		printf(", pipe %d", pipesize);
+ 	if (ntransmitted > 1 && nreceived && (!interval || (options&(F_FLOOD|F_ADAPTIVE)))) {
+ 		int ipg = (1000000*(long long)tv.tv_sec+tv.tv_usec)/(ntransmitted-1);
+-		printf(", ipg/ewma %d.%03d/%d.%03d ms",
++		printf("%sipg/ewma %d.%03d/%d.%03d ms", comma,
+ 		       ipg/1000, ipg%1000, rtt/8000, (rtt/8)%1000);
+ 	}
+ 	putchar('\n');

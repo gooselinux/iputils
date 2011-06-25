@@ -1,0 +1,68 @@
+diff -up iputils-s20071127/in6_flowlabel.h.flowlabel iputils-s20071127/in6_flowlabel.h
+--- iputils-s20071127/in6_flowlabel.h.flowlabel	2010-05-11 15:54:04.133396107 +0200
++++ iputils-s20071127/in6_flowlabel.h	2010-05-11 15:54:04.133396107 +0200
+@@ -0,0 +1,40 @@
++/*
++   It is just a stripped copy of the kernel header "linux/in6.h"
++
++   "Flow label" things are still not defined in "netinet/in*.h" headers,
++   but we cannot use "linux/in6.h" immediately because it currently
++   conflicts with "netinet/in.h" .
++*/
++
++struct in6_flowlabel_req
++{
++	struct in6_addr	flr_dst;
++	__u32	flr_label;
++	__u8	flr_action;
++	__u8	flr_share;
++	__u16	flr_flags;
++	__u16 	flr_expires;
++	__u16	flr_linger;
++	__u32	__flr_pad;
++	/* Options in format of IPV6_PKTOPTIONS */
++};
++
++#define IPV6_FL_A_GET	0
++#define IPV6_FL_A_PUT	1
++#define IPV6_FL_A_RENEW	2
++
++#define IPV6_FL_F_CREATE	1
++#define IPV6_FL_F_EXCL		2
++
++#define IPV6_FL_S_NONE		0
++#define IPV6_FL_S_EXCL		1
++#define IPV6_FL_S_PROCESS	2
++#define IPV6_FL_S_USER		3
++#define IPV6_FL_S_ANY		255
++
++#define IPV6_FLOWINFO_FLOWLABEL		0x000fffff
++#define IPV6_FLOWINFO_PRIORITY		0x0ff00000
++
++#define IPV6_FLOWLABEL_MGR	32
++#define IPV6_FLOWINFO_SEND	33
++
+diff -up iputils-s20071127/Makefile.flowlabel iputils-s20071127/Makefile
+--- iputils-s20071127/Makefile.flowlabel	2010-05-11 15:54:04.040637709 +0200
++++ iputils-s20071127/Makefile	2010-05-11 15:54:04.133396107 +0200
+@@ -34,7 +34,7 @@ ping: ping.o ping_common.o
+ ping6: ping6.o ping_common.o
+ 	$(CC) $(CFLAGS) ping6.o ping_common.o -o ping6
+ 
+-ping.o ping6.o ping_common.o: ping_common.h
++ping.o ping6.o ping_common.o: ping_common.h in6_flowlabel.h
+ tftpd.o tftpsubs.o: tftp.h
+ 
+ rdisc_srv: rdisc_srv.o
+diff -up iputils-s20071127/ping6.c.flowlabel iputils-s20071127/ping6.c
+--- iputils-s20071127/ping6.c.flowlabel	2010-05-11 15:54:04.118364651 +0200
++++ iputils-s20071127/ping6.c	2010-05-11 15:56:19.147615754 +0200
+@@ -75,6 +75,8 @@ char copyright[] =
+ #include <netinet/ip6.h>
+ #include <netinet/icmp6.h>
+ 
++#include "in6_flowlabel.h"
++
+ #ifndef SOL_IPV6
+ #define SOL_IPV6 IPPROTO_IPV6
+ #endif

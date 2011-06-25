@@ -1,0 +1,20 @@
+--- iputils-s20071127/ping.c.dosping	2010-07-08 12:39:25.163851682 +0200
++++ iputils-s20071127/ping.c	2010-07-08 12:39:40.211850770 +0200
+@@ -1082,7 +1082,7 @@ void pr_options(unsigned char * cp, int
+ 				i = j;
+ 			i -= IPOPT_MINOFF;
+ 			if (i <= 0)
+-				continue;
++				break;
+ 			if (i == old_rrlen
+ 			    && !strncmp((char *)cp, old_rr, i)
+ 			    && !(options & F_FLOOD)) {
+@@ -1119,7 +1119,7 @@ void pr_options(unsigned char * cp, int
+ 				i = j;
+ 			i -= 5;
+ 			if (i <= 0)
+-				continue;
++				break;
+ 			flags = *++cp;
+ 			printf("\nTS: ");
+ 			cp++;
